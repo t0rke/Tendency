@@ -9,47 +9,96 @@
 #include "base.hpp"
 #include <iomanip>
 
+using namespace std;
+
+const size_t PRECIS = 50;
+
+string sanitize(string &t) {
+    replace(t.begin(), t.end(), '-', ' ');
+    replace(t.begin(), t.end(), '/', ' ');
+    string j = ".-?!/$^~<>=+\":;{}(),";
+    for (char i: j) t.erase(std::remove(t.begin(), t.end(), i), t.end());
+    return t;
+}
+
+void update_source() {
+    ifstream in("/Users/torke/Jar/Tendency/Tendency/samples/unknown.txt");
+    ofstream out("/Users/torke/Jar/Tendency/Tendency/raw.txt");
+    
+    if (!in) cerr << "Unable to open file unknown.txt " << endl;
+    if (!out) cerr << "Unable to open file source.txt " << endl;
+    
+    string line;
+    vector<string> sentences;
+    while (getline(in, line)) {
+        transform(begin(line), end(line), begin(line), [](char c){return std::tolower(c);});
+        //line.erase(remove_if(line.begin(), line.end(),
+        //[](char c) { return !isalpha(c); } ), line.end());
+        if (line.length() > 0) out << (sanitize(line)) << "\n";
+    }
+}
+
+void corpus_freq(string filename, vector<pair<string, int>> &corpus) {
+    ifstream in(filename);
+    if (!in) {
+        cout << "couldnt open your file" << endl;
+        exit(1);
+    }
+    std::stringstream buffer;
+    buffer << in.rdbuf();
+    in.close();
+    vector<string> list;
+    string word;
+    stringstream ss(buffer.str());
+    
+    while (ss >> word) list.emplace_back(word);
+    
+    size_t word_count = list.size();
+    sort(begin(list), end(list));
+        
+    string root = list.front();
+    int dupes = 0;
+    for (size_t i = 0; i < word_count; ++i) {
+        if (root == list[i]) ++dupes;
+        else {
+            corpus.push_back({root, dupes * 1000000});
+            root = list[i];
+            dupes = 1;
+        }
+    }
+    sort(begin(corpus), end(corpus), compare());
+    corpus.resize(PRECIS);
+}
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
+    //update_source();
+    cout << std::setprecision(9);
     
-    std::cout.precision(9);
-    
-    vector<data> statistics(100);
-    source corpus("/Users/torke/Jar/Tendency/Tendency/corpus.txt", 100);
-    //corpus
+    vector<data> statistics(PRECIS);
+    vector<pair<string,int>> corpus;
+    corpus_freq("corpus.txt", corpus);
     
     // curzan, schlissel, varsity
-    source curzan("/Users/torke/Jar/Tendency/Tendency/curzan.txt", -1);
-    source schlissel("/Users/torke/Jar/Tendency/Tendency/schlissel.txt", -1);
-    source varsity("/Users/torke/Jar/Tendency/Tendency/varsity.txt", -1);
+    // calcualtes the freq and the precence automatically
+    vector<source> sources {{corpus, "curzan.txt"}, {corpus, "schlissel.txt"},
+        {corpus,"varsity.txt"}, {corpus,"unknown.txt"}};
+
     
-    corpus.calculate_presence(corpus.freq);
-    curzan.calculate_presence(corpus.freq);
-    schlissel.calculate_presence(corpus.freq);
-    varsity.calculate_presence(corpus.freq);
-    
-    vector<source> sources;
-    sources.push_back(curzan);
-    sources.push_back(schlissel);
-    sources.push_back(varsity);
-    
-    // generate the presence
-    const size_t source_count = sources.size();
+    const size_t source_count = sources.size() - 1;
     
     // calculate mean
-    for (size_t m = 0; m < 100; ++m) {
+    for (size_t m = 0; m < PRECIS; ++m) {
         double sum = 0;
         for (size_t n = 0; n < source_count; ++n) {
-            sum += sources[n].presence[m].second;
+            sum += sources[n].presence[m];
         }
         statistics[m].mean = sum / source_count;
     }
     // calculate stdev
-    for (size_t i = 0; i < 100; ++i) {
+    for (size_t i = 0; i < PRECIS; ++i) {
         double stdev = 0;
         for (size_t j = 0; j < source_count; ++j) {
-            double diff = sources[j].presence[i].second - statistics[i].mean;
+            double diff = sources[j].presence[i] - statistics[i].mean;
             stdev = diff * diff;
         }
         stdev /= (source_count - 1);
@@ -57,23 +106,23 @@ int main(int argc, const char * argv[]) {
         statistics[i].stdev = stdev;
     }
     
-    for (size_t z = 0; z < 100; ++z) {
-        size_t ccount = corpus.word_count;
-        statistics[z].zscore = ((corpus.freq[z].second / ccount) - statistics[z].mean) / statistics[z].stdev;
-        cout << "Test Case z-score for feature [" + corpus.freq[z].first + "] is: " + to_string(statistics[z].zscore) << endl;
+    // calculate zscore for corpus and samples
+    for (size_t y = 0; y < sources.size(); ++y) {
+        for (size_t z = 0; z < PRECIS; ++z) {
+            sources[y].zscore[z] = (sources[y].presence[z] - statistics[z].mean) / statistics[z].stdev;
+        }
     }
     
-    for (int i = 0; i < 100; ++i) {
-        //cout << corpus.freq[i].second / corpus.word_count << endl;
-        //cout << statistics[i].mean << " " << statistics[i].stdev << endl;
+    // links the deltas together
+    const size_t last = sources.size() - 1;
+    for (size_t y = 0; y < source_count; ++y) {
+        double delta = 0;
+        for (size_t z = 0; z < PRECIS; ++z) {
+            delta += abs(sources[last].zscore[z] - sources[y].zscore[z]);
+        }
+        delta /= PRECIS;
+        cout << "Delta score for cand [" + sources[y].profile + "] is: " + to_string(delta) << endl;
     }
-
-    
-    
-    //curzan.print_p();
-    //corpus.print();
-    
-    std::cout << "Hello, World!\n";
     return 0;
 }
 
