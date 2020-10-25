@@ -11,14 +11,12 @@ Modify the following parts of the code with your relevant source material:
 - [ ] create a file for the unknown sample
 
 ```c++ 
-{
-    // the shared text body
-    corpus_freq("corpus", corpus);
+// the shared text body
+corpus_freq("corpus", corpus);
 
-    //text by author
-    vector<source> sources {{corpus, "curzan"}, {corpus, "schlissel"},
-    {corpus,"varsity"}, {corpus,"unknown"}};
-    }
+//text by author
+vector<source> sources {{corpus, "curzan"}, {corpus, "schlissel"},
+{corpus,"varsity"}, {corpus,"unknown"}};
 ```
 1. the `corpus` which contains a lump sum of all of the text inputs
 2. the vector of `source` objects which holds each individual source i.e. author
