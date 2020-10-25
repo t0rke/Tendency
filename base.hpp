@@ -33,7 +33,7 @@ public:
     // builds the default dictionary of words
     source(const std::vector<std::pair<std::string,int>> &corpus, std::string filename) {
         profile = filename;
-        std::ifstream in(profile);
+        std::ifstream in(profile + ".txt");
         if (!in) {
             std::cout << "couldnt open file " + profile << std::endl;
             exit(1);

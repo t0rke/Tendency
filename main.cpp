@@ -39,7 +39,7 @@ void update_source() {
 }
 
 void corpus_freq(string filename, vector<pair<string, int>> &corpus) {
-    ifstream in(filename);
+    ifstream in(filename + ".txt");
     if (!in) {
         cout << "couldnt open your file" << endl;
         exit(1);
@@ -72,16 +72,16 @@ void corpus_freq(string filename, vector<pair<string, int>> &corpus) {
 
 int main(int argc, const char * argv[]) {
     //update_source();
-    cout << std::setprecision(9);
+    cout << std::setprecision(15);
     
     vector<data> statistics(PRECIS);
     vector<pair<string,int>> corpus;
-    corpus_freq("corpus.txt", corpus);
+    corpus_freq("corpus", corpus);
     
     // curzan, schlissel, varsity
     // calcualtes the freq and the precence automatically
-    vector<source> sources {{corpus, "curzan.txt"}, {corpus, "schlissel.txt"},
-        {corpus,"varsity.txt"}, {corpus,"unknown.txt"}};
+    vector<source> sources {{corpus, "curzan"}, {corpus, "schlissel"},
+        {corpus,"varsity"}, {corpus,"unknown"}};
 
     
     const size_t source_count = sources.size() - 1;
