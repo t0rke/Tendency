@@ -47,13 +47,14 @@ public:
         while (ss >> word) list.emplace_back(word);
         word_count = list.size();
         std::sort(begin(list), end(list));
-            
+        
+        freq.resize(list.size());
         std::string root = list.front();
         int dupes = 0;
         for (size_t i = 0; i < word_count; ++i) {
             if (root == list[i]) ++dupes;
             else {
-                freq.push_back({root, dupes * 1000000});
+                freq[i] = {root, dupes * 1000000};
                 root = list[i];
                 dupes = 1;
             }
@@ -73,14 +74,17 @@ public:
             while (j < freq_size) {
                 if (corpus[i].first.length() == freq[j].first.length()) {
                     if (corpus[i].first == freq[j].first) {
+                        //std::cout << freq[j].first << std::endl;
+                        //std::cout << freq[j].second/ (double) word_count << std::endl;
                         presence[i] = {freq[j].second / (double) word_count};
                         break;
                     }
                 }
                 ++j;
             }
-            
+            // cout << presence << endl;
         }
+        //std::cout << "----------------------------------" << std::endl;
     }
 };
 
