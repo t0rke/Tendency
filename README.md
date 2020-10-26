@@ -5,18 +5,18 @@ Tendency is a C++ program that implements a modification of the [John Burrows De
 ## Usage
 Clone the relevant git files .
 Modify the following parts of the code with your relevant source material:
-- [x] set the working directory to the provided `samples` folder
-- [x] update the `corpus` with the cumulative texts
-- [x] create a text file for each author
-- [x] create a file for the unknown sample
+- [ ] set the working directory to the provided `samples` folder
+- [ ] update the `corpus` with the cumulative texts
+- [ ] create a text file for each author
+- [ ] create a file for the unknown sample
 
-```c++
-    // the shared text body
-    corpus_freq("corpus", corpus);
+```c++ 
+// the shared text body
+corpus_freq("corpus", corpus);
 
-    //text by author
-    vector<source> sources {{corpus, "curzan"}, {corpus, "schlissel"},
-    {corpus,"varsity"}, {corpus,"unknown"}};
+//text by author
+vector<source> sources {{corpus, "curzan"}, {corpus, "schlissel"},
+{corpus,"varsity"}, {corpus,"unknown"}};
 ```
 1. the `corpus` which contains a lump sum of all of the text inputs
 2. the vector of `source` objects which holds each individual source i.e. author
