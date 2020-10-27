@@ -20,14 +20,16 @@ struct compare {
 };
 
 struct data {
-    double mean = 0, stdev = 0;
+    double mean = 0, stdev = 0, delta = 0;
 };
 
 class source {
 public:
+    bool analysis = false;
     size_t word_count = 0;
     std::string profile;
     std::vector<double> zscore, presence;
+    std::vector<int> standard_freq;
     std::vector<std::pair<std::string,int>> freq;
     
     // builds the default dictionary of words
@@ -54,7 +56,7 @@ public:
         for (size_t i = 0; i < word_count; ++i) {
             if (root == list[i]) ++dupes;
             else {
-                freq[i] = {root, dupes * 1000000};
+                freq[i] = {root, dupes};
                 root = list[i];
                 dupes = 1;
             }
@@ -68,6 +70,7 @@ public:
         const size_t corpus_size = corpus.size();
         const size_t freq_size = freq.size();
         presence.resize(corpus_size);
+        if (analysis) standard_freq.resize(corpus_size);
         zscore.resize(corpus_size);
         for (size_t i = 0; i < corpus_size; ++i) {
             size_t j = 0;
@@ -75,16 +78,18 @@ public:
                 if (corpus[i].first.length() == freq[j].first.length()) {
                     if (corpus[i].first == freq[j].first) {
                         //std::cout << freq[j].first << std::endl;
-                        //std::cout << freq[j].second/ (double) word_count << std::endl;
+                        //std::cout << (freq[j].second/ (double) word_count << std::endl;
                         presence[i] = {freq[j].second / (double) word_count};
+                        if (analysis) standard_freq[i] = freq[j].second;
                         break;
                     }
                 }
                 ++j;
             }
-            // cout << presence << endl;
+            // the greater the multiplier the more skew for the 0 values.
+            //std::cout << presence[i]<< std::endl;
         }
-        //std::cout << "----------------------------------" << std::endl;
+        //std::cout << "--------------------------" << std::endl;
     }
 };
 

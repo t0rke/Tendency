@@ -32,6 +32,9 @@ Delta score for cand [varsity] is: 4.601074
 ```
 Therefore the calculated result with the smallest `delta score` author with the greatest  probability of writing the sample.
 
+![alttext](https://github.com/[t0rke]/[Tendency]/blob/[branch]/image.jpg?raw=true)
+![alttext](https://github.com/[t0rke]/[Tendency]/blob/[branch]/image.jpg?raw=true)
+
 ### Authors
 >*bvssy* and @t0rke
 
