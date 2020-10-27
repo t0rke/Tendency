@@ -115,6 +115,7 @@ int main(int argc, const char * argv[]) {
         for (size_t z = 0; z < PRECIS; ++z) {
             sources[y].zscore[z] = (sources[y].presence[z] - statistics[z].mean) / statistics[z].stdev;
             //cout << sources[y].zscore[z] << " " << sources[y].presence[z] << " " << statistics[z].mean << " " << statistics[z].stdev << endl;
+            //cout << sources[y].zscore[z] << endl;
         }
         //cout << "----------------" << endl;
     }
@@ -125,15 +126,15 @@ int main(int argc, const char * argv[]) {
         double delta = 0;
         for (size_t z = 0; z < PRECIS; ++z) {
             delta += abs(sources[last].zscore[z] - sources[y].zscore[z]);
-            //cout << abs(sources[last].zscore[z] - sources[y].zscore[z]) << endl;
+            cout << abs(sources[last].zscore[z] - sources[y].zscore[z]) << endl;
         }
         delta /= PRECIS;
-        cout << "Delta score for cand [" + sources[y].profile + "] is: " + to_string(delta) << endl;
-        //cout << "--------------" << endl;
+        //cout << "Delta score for cand [" + sources[y].profile + "] is: " + to_string(delta) << endl;
+        cout << "--------------" << endl;
     }
     
     for (int i = 0; i < corpus.size(); ++i) {
-    cout << statistics[i].stdev << endl;
+    //cout << statistics[i].stdev << endl;
       // cout << sources[4].standard_freq[i] <<  endl;
         //cout << (corpus[i].second/ (double) corpus.size()) * 10 << endl;
     }
