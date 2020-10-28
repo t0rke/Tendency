@@ -13,13 +13,13 @@
 #include <fstream>
 #include <stdio.h>
 
-using namespace std;
-
 struct compare {
-    bool operator()(const std::pair<std::string,int> &a, const std::pair<std::string,int> &b) const {
-        return (a.second > b.second);
+    bool operator()(const std::pair<std::string,int> &lhs, const std::pair<std::string,int> &rhs) const {
+        return (lhs.second > rhs.second);
     }
 };
+
+
 
 struct data {
     double mean = 0, stdev = 0, delta = 0;
@@ -59,7 +59,7 @@ public:
         sort(begin(freq), end(freq), compare());
         calculate_presence(corpus);
     }
-   
+private:
     // calculates the precence of word n from corpus in subcorp, calculates resulting mean and the stdev
     void const calculate_presence(const std::vector<std::pair<std::string,int>> &corpus) {
         const size_t corpus_size = corpus.size();
@@ -91,11 +91,14 @@ public:
 
 class delta {
 public:
-    vector<data> statistics;
-    vector<source> sources;
+    std::vector<data> statistics;
+    std::vector<source> sources;
+    std::vector<double> sub_delta;
     size_t PRECIS = 0;
     int upper_bound = 0;
-    
+    bool analysis = false;
+
+private:
     void calculate_mean() {
         for (size_t i = 0; i < PRECIS; ++i) {
             double sum = 0;
@@ -105,7 +108,6 @@ public:
             statistics[i].mean = sum / upper_bound;
         }
     }
-    
     void calculate_stdev() {
         for (size_t i = 0; i < PRECIS; ++i) {
             double curr_dev = 0;
@@ -119,7 +121,6 @@ public:
             statistics[i].stdev = curr_dev;
         }
     }
-    
     void calculate_zscore() {
         for (size_t y = 0; y < sources.size(); ++y) {
             for (size_t z = 0; z < PRECIS; ++z) {
@@ -127,7 +128,6 @@ public:
             }
         }
     }
-    
     void calculate_delta() {
         for (size_t y = 0; y < upper_bound; ++y) {
             double delta = 0;
@@ -135,15 +135,21 @@ public:
                 delta += abs(sources.back().zscore[z] - sources[y].zscore[z]);
             }
             delta /= PRECIS;
-            cout << delta << "        ";
-            //cout << "--------------" << endl;
+            // stores the final deltas for *this object
+            sub_delta[y] = delta;
+            if (analysis) std::cout << std::fixed << std::setprecision(5) << delta << ",";
         }
-        cout << endl;
+        if (analysis) std::cout << std::endl;
     }
+public:
+    delta();
     
-    delta(const vector<pair<string,int>> &corpus, const vector<pair<string, string>> &authors, bool verbose) {
+    delta(const std::vector<std::pair<std::string,int>> &corpus, const std::vector<std::pair<std::string, std::string>> &authors, bool verbose) {
         statistics.resize(corpus.size());
+        sub_delta.resize(authors.size() - 1);
         PRECIS = corpus.size();
+        
+        analysis = verbose;
         
         // creates the features for each author
         for (size_t i = 0; i < authors.size(); ++i) {
@@ -151,6 +157,7 @@ public:
         }
         upper_bound = int(sources.size() - 1);
         
+        // calculates the following stats for each feature;
         calculate_mean();
         calculate_stdev();
         calculate_zscore();

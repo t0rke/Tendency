@@ -11,22 +11,19 @@
 
 using namespace std;
 
-size_t PRECIS = 100;
+
 const bool output = false;
 
-void removeSpaces(string &str) {
+void trim(string &str) {
     int n = str.length();
     int i = 0, j = -1;
     bool spaceFound = false;
-  
     while (++j < n && str[j] == ' ');
-  
     while (j < n) {
         if (str[j] != ' ') {
             if ((str[j] == '.' || str[j] == ',' || str[j] == '?') && i - 1 >= 0 && str[i - 1] == ' ')
                 str[i - 1] = str[j++];
             else str[i++] = str[j++];
-
             spaceFound = false;
         }
         else if (str[j++] == ' ') {
@@ -47,7 +44,7 @@ string sanitize(string &str) {
     string j = ".-?!/$^~<>=+\":;{}(),";
     for (char i: j) str.erase(std::remove(str.begin(), str.end(), i), str.end());
     transform(begin(str), end(str), begin(str), [](char c){return std::tolower(c);});
-    removeSpaces(str);
+    trim(str);
     return str;
 }
 
@@ -56,8 +53,6 @@ vector<pair<string,string>> prep_data() {
     std::string path = "/Users/torke/Desktop/essays";
     for (const auto & entry : std::__fs::filesystem::directory_iterator(path)) files.push_back(entry.path());
     std::sort(begin(files), end(files));
-    // for (size_t i = 0; i < files.size(); ++i) cout << files[i] << endl;
-    
     const vector<int> hamilton = {1, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23, 24, 25,
                     26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 59, 60, 61, 65, 66, 67, 68, 69, 70,
                     71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85};
@@ -68,7 +63,6 @@ vector<pair<string,string>> prep_data() {
     
     pair<string,string> hamilton_full = {"hamilton", ""}, madison_full = {"madison", ""},
     jay_full = {"jay", ""}, shared_full = {"shared", ""}, disputed_full{"disputed", ""};
-    
     for (int i  = 0; i < 85; ++i) {
         string filename = "essay" + to_string(i + 1) + ".txt";
         if (i < 9) {
@@ -109,31 +103,12 @@ vector<pair<string,string>> prep_data() {
             continue;
         }
         // DISPUTED <<IGNORE>> //
-        if (i + 1 == 49) disputed_full.second = essay;
+        if (i + 1 == 53) disputed_full.second = essay;
         if (output) cout << filename + " -> "  + disputed_full.first << endl;
         
     }
-    // cout << jay_full.second << endl;
+    cout << "Prepped Files:" << endl;
     return {hamilton_full, madison_full, jay_full, shared_full, disputed_full};
-}
-
-
-void update_source() {
-    ifstream in("hamiltonandmadison.txt");
-    ofstream out("ytemp.txt");
-    
-    if (!in) cerr << "Unable to open file unknown.txt " << endl;
-    if (!out) cerr << "Unable to open file source.txt " << endl;
-    
-    string line;
-    vector<string> sentences;
-    while (getline(in, line)) {
-        transform(begin(line), end(line), begin(line), [](char c){return std::tolower(c);});
-        //line.erase(remove_if(line.begin(), line.end(),
-        //[](char c) { return !isalpha(c); } ), line.end());
-        if (line.length() > 0) out << (sanitize(line)) << "\n";
-    }
-    exit(1);
 }
 
 vector<pair<string,int>> corpus_freq(string body) {
@@ -158,109 +133,58 @@ vector<pair<string,int>> corpus_freq(string body) {
         }
     }
     sort(begin(corpus), end(corpus), compare());
+    cout << "Created Corpus:" << endl;
     return corpus;
 }
 
 int main(int argc, const char * argv[]) {
-    
-    
-    //update_source();
-    cout << std::setprecision(7);
-    
-    
     const vector<pair<string,string>> authors = prep_data();
-    
-    
-    // curzan, schlissel, varsity
-    // calcualtes the freq and the precence automatically
     string cumulative;
     for (int i = 0; i < authors.size(); ++i) cumulative += authors[i].second;
     const vector<pair<string,int>> corpus = corpus_freq(cumulative);
     
-    if (output) {
-        ofstream out("dummy.txt");
-        if (!out) cerr << "Unable to open file source.txt " << endl;
-        out << cumulative;
-    }
+    double delta_hamilton = 0;
+    double delta_madison = 0;
+    double delta_jay = 0;
+    double delta_shared = 0;
     
-    for (int i = 1; i < 101; ++i) {
+    // TODO: change 'interval' to manipulate the number of runs
+    int interval = 1;
+    int bound = (1000 / interval) + 1;
+    cout << "----------------------------------" << endl;
+    for (int i = 1; i < bound; ++i) {
         vector<pair<string,int>> mirror = corpus;
         mirror.resize(i);
-        delta(mirror, authors, false);
+        delta temp = delta(mirror, authors, false);
+        delta_hamilton += temp.sub_delta[0];
+        //cout << delta_hamilton << endl;
+        delta_madison += temp.sub_delta[1];
+        delta_jay += temp.sub_delta[2];
+        delta_shared += temp.sub_delta[3];
+        cout << "   [Ran " + to_string(i) + "] -> fDepth: " + to_string(i) << endl;
     }
+    cout << "----------------------------------" << endl;
+    //cout << (delta_hamilton / 100)  << " " << (delta_madison / 100) << " " << (delta_jay / 100) << " " << (delta_shared / 100) << endl;
     
-    /*
-    for (int p = 98; p < 100 + 1; ++p) {
-
-        vector<data> statistics(PRECIS);
-        corpus_freq(corpus, cumulative);
-        for (size_t i = 0; i < corpus.size(); ++i) {
-            //cout << corpus[i].second << endl;
-        }
-        
-        vector<source> sources;
-        for (size_t i = 0; i < authors.size(); ++i) {
-            sources.push_back({corpus, authors[i].first, authors[i].second});
-        }
-
-        const size_t source_count = sources.size() - 1;
-        
-        // calculate mean
-        for (size_t m = 0; m < PRECIS; ++m) {
-            double sum = 0;
-            for (size_t n = 0; n < source_count; ++n) {
-                sum += sources[n].presence[m];
-            }
-            statistics[m].mean = sum / source_count;
-        }
-        // calculate stdev
-        for (size_t i = 0; i < PRECIS; ++i) {
-            //vector<double> parts(source_count);
-            double curr_dev = 0;
-            for (size_t j = 0; j < source_count; ++j) {
-                double diff = sources[j].presence[i] - statistics[i].mean;
-                diff = diff * diff;
-                curr_dev += diff;
-            }
-        
-            curr_dev /= (source_count - 1);
-            curr_dev = sqrt(curr_dev);
-            statistics[i].stdev = curr_dev;
-        }
-        
-        // calculate zscore for corpus and samples
-        for (size_t y = 0; y < sources.size(); ++y) {
-            for (size_t z = 0; z < PRECIS; ++z) {
-                sources[y].zscore[z] = (sources[y].presence[z] - statistics[z].mean) / statistics[z].stdev;
-                //cout << sources[y].zscore[z] << " " << sources[y].presence[z] << " " << statistics[z].mean << " " << statistics[z].stdev << endl;
-                //cout << sources[y].zscore[z] << endl;
-            }
-            //cout << "----------------" << endl;
-        }
-        
-        // links the deltas together
-        const size_t last = sources.size() - 1;
-        for (size_t y = 0; y < source_count; ++y) {
-            double delta = 0;
-            for (size_t z = 0; z < PRECIS; ++z) {
-                delta += abs(sources[last].zscore[z] - sources[y].zscore[z]);
-                //cout << abs(sources[last].zscore[z] - sources[y].zscore[z]) << endl;
-            }
-            delta /= PRECIS;
-            // cout << "Delta score for cand [" + sources[y].profile + "] is: " + to_string(delta) << endl;
-            cout << delta << ",";
-            //cout << "--------------" << endl;
-        }
-        cout << endl;
-        
-        for (int i = 0; i < corpus.size(); ++i) {
-            //cout << statistics[i].stdev << endl;
-            //cout << statistics[i].mean << endl;
-            //cout << sources[0].standard_freq[i] <<  endl;
-            //cout << (corpus[i].second/ (double) corpus.size()) * 10 << endl;
-        }
-    }
-    */
-    return 0;
+    cout << endl << endl;
+    cout << "The following Results were calculted by slicing every: " + to_string(interval) + "th possible" << endl;
+    cout << "Feature Depth (fDepth) for a total of: "  + to_string(bound - 1) + " Runs" << endl;
+    
+    
+    cout << "   The Mixed Depth Delta Score for Cand [" + authors[0].first + "] was: " + to_string(delta_hamilton) << endl;
+    cout << "   The Mixed Depth Delta Score for Cand [" + authors[1].first + "] was: " + to_string(delta_madison) << endl;
+    cout << "   The Mixed Depth Delta Score for Cand [" + authors[2].first + "] was: " + to_string(delta_jay) << endl;
+    cout << "   The Mixed Depth Delta Score for Cand [" + authors[3].first + "] was: " + to_string(delta_shared) << endl << endl;
+    
+    double min  = std::min({ delta_hamilton, delta_madison, delta_jay, delta_shared});
+    string suspect;
+    if (min == delta_hamilton) suspect = "Alexander Hamilton";
+    else if (min == delta_madison) suspect = "James Madison";
+    else if (min == delta_jay) suspect = "John Jay";
+    else if (min == delta_jay) suspect = "both Alexander Hamilton and James Madison";
+    
+    cout << "   |Based on these findings the unknown sample was" << endl;
+    cout << "   |most likely written by: " + suspect << endl;
+     
 }
 
