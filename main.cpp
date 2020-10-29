@@ -11,7 +11,7 @@
 
 using namespace std;
 
-const bool OUTPUT = false;
+const bool OUTPUT = true;
 const int SOURCE_COUNT = 85;
 // TODO: change 'DOCUMENT' to change which document is being analyzed
 // The DISPUTED ARTICLES ARE [49, 50, 51, 52, 53, 54, 55, 56, 57]
