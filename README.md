@@ -16,13 +16,13 @@ Out of the 85 essays, essays 49 - 57, 62, 63 were never officially assigned auth
 
 In my implementation I attempt to use the relative `presence` (relative frequency) of a predefined number of the most frequent elements in the cumulative body of works (sum of all author's works) noted as `corpus` from here onwards. 
 
-##### Definitions
-**corpus** - a list of the frequency of every word contained in the cumulative works the provided samples 
-**features** - a set of 'key words' chosen based on the frequency of words oberserved *within* the corpus
-**authors** - each body of text written by a unique candidate
-**presence**- The relative frequency of a `feature` in any authors sup-corpus
+#### Definitions
+- **corpus** - a list of the frequency of every word contained in the cumulative works the provided samples 
+- **features** - a set of 'key words' chosen based on the frequency of words oberserved *within* the corpus
+- **authors** - each body of text written by a unique candidate
+- **presence**- The relative frequency of a `feature` in any authors sup-corpus
 
-##### Processes
+#### Processes
 The relevant calculations can be reduced the following few steps:
 1. Create a set of an arbitrary number of `features` to compare to each author.
 2. For each one of the `features` calculate the precense of this feature for each author and the unknown source.
