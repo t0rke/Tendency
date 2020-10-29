@@ -11,119 +11,102 @@
 
 using namespace std;
 
+const bool OUTPUT = false;
+const int SOURCE_COUNT = 85;
+// TODO: change 'DOCUMENT' to change which document is being analyzed
+// The DISPUTED ARTICLES ARE [49, 50, 51, 52, 53, 54, 55, 56, 57]
+const int DISPUTED_ESSAY = 50;
 
-const bool output = false;
+// TODO: change the following values, to manipulate the Feature Depth, Interval and number of runs
+// maximum feature count
+const int MAX_DEPTH = 1000;
+const int INTERVAL = 10;
+// number of averaged sample runs
+const int RUNS = MAX_DEPTH / INTERVAL;
+const vector<string> CANDIDATES {{"Alexander Hamilton"}, {"James Madison"},
+    {"John Jay"}, {"Disputed Authorship"}};
 
-void trim(string &str) {
-    int n = str.length();
-    int i = 0, j = -1;
-    bool spaceFound = false;
-    while (++j < n && str[j] == ' ');
-    while (j < n) {
-        if (str[j] != ' ') {
-            if ((str[j] == '.' || str[j] == ',' || str[j] == '?') && i - 1 >= 0 && str[i - 1] == ' ')
-                str[i - 1] = str[j++];
-            else str[i++] = str[j++];
-            spaceFound = false;
-        }
-        else if (str[j++] == ' ') {
-            if (!spaceFound) {
-                str[i++] = ' ';
-                spaceFound = true;
-            }
-        }
-    }
-    if (i <= 1) str.erase(str.begin() + i, str.end());
-    else str.erase(str.begin() + i - 1, str.end());
-}
-
-string sanitize(string &str) {
+// strips each essay of punctuation and lowecases all characters
+void sanitize(string &str) {
     replace(str.begin(), str.end(), '-', ' ');
     replace(str.begin(), str.end(), '/', ' ');
     replace(str.begin(), str.end(), '\n', ' ');
     string j = ".-?!/$^~<>=+\":;{}(),";
     for (char i: j) str.erase(std::remove(str.begin(), str.end(), i), str.end());
     transform(begin(str), end(str), begin(str), [](char c){return std::tolower(c);});
-    trim(str);
-    return str;
 }
 
+// reads every essay in the provided folder and credits it to the correct author
+// output a vectors of authors, whose elements contain each authors subcorpus of the essays
 vector<pair<string,string>> prep_data() {
-    vector<string> files;
-    std::string path = "/Users/torke/Desktop/essays";
-    for (const auto & entry : std::__fs::filesystem::directory_iterator(path)) files.push_back(entry.path());
-    std::sort(begin(files), end(files));
-    const vector<int> hamilton = {1, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23, 24, 25,
-                    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 59, 60, 61, 65, 66, 67, 68, 69, 70,
-                    71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85};
-    const vector<int> madison = {10, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 58};
-    const vector<int> jay = {2, 3, 4, 5, 64};
-    const vector<int> shared = {18, 19, 20};
-    //const vector<int> disputed = {49, 50, 51, 52, 53, 54, 55, 56, 57, 62, 63};
+    vector<string> files(SOURCE_COUNT);
     
-    pair<string,string> hamilton_full = {"hamilton", ""}, madison_full = {"madison", ""},
-    jay_full = {"jay", ""}, shared_full = {"shared", ""}, disputed_full{"disputed", ""};
-    for (int i  = 0; i < 85; ++i) {
-        string filename = "essay" + to_string(i + 1) + ".txt";
-        if (i < 9) {
-            filename = "essay0" + to_string(i + 1) + ".txt";
-        }
+    // holds the relevant essays seperated by author, doesnt include the disputed essays
+    for (const auto & entry :__fs::filesystem::directory_iterator("/Users/torke/Desktop/essays")) files.push_back(entry.path());
+    const vector<vector<int>> essays {{1, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23, 24, 25,
+                        26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 59, 60, 61, 65, 66, 67, 68, 69, 70,
+                        71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85}, {10, 18, 19, 20, 37, 38, 39,
+                            40, 41, 42, 43, 44, 45, 46, 47, 48, 58}, {2, 3, 4, 5, 64}, {DISPUTED_ESSAY}};
+    vector<pair<string,string>> sources(CANDIDATES.size());
+    cout << "Prepped Files:" << endl;
+    for (int a = 0; a < CANDIDATES.size(); ++a) sources[a] = {CANDIDATES[a], ""};
+    for (int i  = 0; i < SOURCE_COUNT; ++i) {
+        string filename;
+        if (i < 9) filename = "essay0" + to_string(i + 1) + ".txt";
+        else filename = "essay" + to_string(i + 1) + ".txt";
         std::ifstream in(filename);
         std::stringstream buffer;
         buffer << in.rdbuf();
-        in.close();
         std::string essay = buffer.str();
-        essay = sanitize(essay);
-        // hamilton
-        auto ham = std::find(begin(hamilton), end(hamilton), i + 1);
-        if (ham != end(hamilton)) {
-            if (output) cout << filename + " -> "  + hamilton_full.first << endl;
-            hamilton_full.second = hamilton_full.second + " " + essay;
-            continue;
-        }
-        // madison
-        auto mad = std::find(begin(madison), end(madison), i + 1);
-        if (mad != end(madison)) {
-            if (output) cout << filename + " -> "  + madison_full.first << endl;
-            madison_full.second = madison_full.second + " " + essay;
-            continue;
-        }
-        // shared
-        auto sha = std::find(begin(shared), end(shared), i + 1);
-        if (sha != end(shared)) {
-            if (output) cout << filename + " -> "  + shared_full.first << endl;
-            shared_full.second = shared_full.second + " " + essay;
-            continue;
-        }
-        // jay
-        auto ja = std::find(begin(jay), end(jay), i + 1);
-        if (ja != end(jay)) {
-            if (output) cout << filename + " -> "  + jay_full.first << endl;
-            jay_full.second = jay_full.second + " " + essay;
-            continue;
-        }
-        // DISPUTED <<IGNORE>> //
-        if (i + 1 == 53) disputed_full.second = essay;
-        if (output) cout << filename + " -> "  + disputed_full.first << endl;
+        sanitize(essay);
         
+        for (size_t j = 0; j < sources.size(); ++j) {
+            // if the essay number, its adds it to the relevant author's text string
+            const auto source_iter = std::find(begin(essays[j]), end(essays[j]), i + 1);
+            if (source_iter != end(essays[j])) {
+                if (OUTPUT) cout << filename + " -> "  + sources[j].first << endl;
+                sources[j].second = sources[j].second + " " + essay;
+            }
+        }
     }
-    cout << "Prepped Files:" << endl;
-    return {hamilton_full, madison_full, jay_full, shared_full, disputed_full};
+    cout << "Analysing Document: {" + to_string(DISPUTED_ESSAY) + "}" << endl;
+    return sources;
 }
 
-vector<pair<string,int>> corpus_freq(string body) {
+// prints the run report after a completed run
+const void generate_output (const vector<pair<string,string>> &authors, const vector<double> &deltas) {
+    cout << endl;
+    cout << "   |The following Results were calculted by slicing every: " + to_string(INTERVAL) + "th possible <fDepth> and" << endl;
+    cout << "   |averaging all subcomponenents in "  + to_string(RUNS) + " runs to calculate the Mixed Depth Delta Score." << endl << endl;
+    
+    for (int l = 0; l < deltas.size(); ++l) {
+        cout << "       The MDD Score for [" + authors[l].first + "]: " + to_string(deltas[l] / RUNS) << endl;
+    }
+    cout << endl;
+    // finds the lowest author's delta score
+    double min = *min_element(begin(deltas), end(deltas));
+    cout << "   |Based on these findings ESSAY " + to_string(DISPUTED_ESSAY) + " was" << endl;
+    cout << "   |most likely written by: ";
+    for (size_t i = 0; i < deltas.size(); ++i) if (min == deltas[i]) cout << CANDIDATES[i] << endl << endl;;
+}
+
+// creates a frequency table of ALL POSSIBLE features
+vector<pair<string,int>> generate_features(string &body) {
     vector<pair<string, int>> corpus;
     string word;
-    stringstream ss(body);
     vector<string> list;
+    stringstream ss(body);
     
+    // splits the string into a vector of strings
     while (ss >> word) list.emplace_back(word);
     
     size_t word_count = list.size();
+    // puts duplicate elements size by side
     sort(begin(list), end(list));
         
     string root = list.front();
     int dupes = 0;
+    // calculates the frequency of every word by counting duplicate neighbors
     for (size_t i = 0; i < word_count; ++i) {
         if (root == list[i]) ++dupes;
         else {
@@ -132,59 +115,31 @@ vector<pair<string,int>> corpus_freq(string body) {
             dupes = 1;
         }
     }
+    // sorts in decending order
     sort(begin(corpus), end(corpus), compare());
     cout << "Created Corpus:" << endl;
     return corpus;
 }
 
 int main(int argc, const char * argv[]) {
-    const vector<pair<string,string>> authors = prep_data();
     string cumulative;
+    // preps and generates all of the full texts ONE time
+    const vector<pair<string,string>> authors = prep_data();
     for (int i = 0; i < authors.size(); ++i) cumulative += authors[i].second;
-    const vector<pair<string,int>> corpus = corpus_freq(cumulative);
+    // generates a completed frequency table of features
+    const vector<pair<string,int>> features = generate_features(cumulative);
+    vector<double> deltas (authors.size() - 1);
     
-    double delta_hamilton = 0;
-    double delta_madison = 0;
-    double delta_jay = 0;
-    double delta_shared = 0;
-    
-    // TODO: change 'interval' to manipulate the number of runs
-    int interval = 1;
-    int bound = (1000 / interval) + 1;
-    cout << "----------------------------------" << endl;
-    for (int i = 1; i < bound; ++i) {
-        vector<pair<string,int>> mirror = corpus;
-        mirror.resize(i);
+    for (int i = 1; i < RUNS + 1; ++i) {
+        // resizes the feature amount to the prechosen INTERVAl for this run
+        vector<pair<string,int>> mirror = features;
+        mirror.resize(i * INTERVAL);
         delta temp = delta(mirror, authors, false);
-        delta_hamilton += temp.sub_delta[0];
-        //cout << delta_hamilton << endl;
-        delta_madison += temp.sub_delta[1];
-        delta_jay += temp.sub_delta[2];
-        delta_shared += temp.sub_delta[3];
-        cout << "   [Ran " + to_string(i) + "] -> fDepth: " + to_string(i) << endl;
+        for (int k = 0; k < temp.sub_delta.size(); ++k) deltas[k] += temp.sub_delta[k];
+        cout << "   [RUN " + to_string(i) + "] -> fDepth: " + to_string(i * INTERVAL) << endl;
     }
-    cout << "----------------------------------" << endl;
-    //cout << (delta_hamilton / 100)  << " " << (delta_madison / 100) << " " << (delta_jay / 100) << " " << (delta_shared / 100) << endl;
-    
-    cout << endl << endl;
-    cout << "The following Results were calculted by slicing every: " + to_string(interval) + "th possible" << endl;
-    cout << "Feature Depth (fDepth) for a total of: "  + to_string(bound - 1) + " Runs" << endl;
-    
-    
-    cout << "   The Mixed Depth Delta Score for Cand [" + authors[0].first + "] was: " + to_string(delta_hamilton) << endl;
-    cout << "   The Mixed Depth Delta Score for Cand [" + authors[1].first + "] was: " + to_string(delta_madison) << endl;
-    cout << "   The Mixed Depth Delta Score for Cand [" + authors[2].first + "] was: " + to_string(delta_jay) << endl;
-    cout << "   The Mixed Depth Delta Score for Cand [" + authors[3].first + "] was: " + to_string(delta_shared) << endl << endl;
-    
-    double min  = std::min({ delta_hamilton, delta_madison, delta_jay, delta_shared});
-    string suspect;
-    if (min == delta_hamilton) suspect = "Alexander Hamilton";
-    else if (min == delta_madison) suspect = "James Madison";
-    else if (min == delta_jay) suspect = "John Jay";
-    else if (min == delta_jay) suspect = "both Alexander Hamilton and James Madison";
-    
-    cout << "   |Based on these findings the unknown sample was" << endl;
-    cout << "   |most likely written by: " + suspect << endl;
+    // prints the run report
+    generate_output(authors, deltas);
      
 }
 

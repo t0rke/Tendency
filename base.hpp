@@ -19,14 +19,13 @@ struct compare {
     }
 };
 
-
-
 struct data {
     double mean = 0, stdev = 0, delta = 0;
 };
 
 class source {
 public:
+    // responsible for subrun output
     bool analysis = false;
     size_t word_count = 0;
     std::string profile;
@@ -36,6 +35,7 @@ public:
     
     // builds the default dictionary of words
     source(const std::vector<std::pair<std::string,int>> &corpus, std::string filename, std::string body) {
+        if (body.empty()) exit(1);
         profile = filename;
         std::vector<std::string> list;
         std::string word;
@@ -88,7 +88,8 @@ private:
     }
 };
 
-
+// manages a source element at a
+// FIXED particular feature depth
 class delta {
 public:
     std::vector<data> statistics;
@@ -132,23 +133,21 @@ private:
         for (size_t y = 0; y < upper_bound; ++y) {
             double delta = 0;
             for (size_t z = 0; z < PRECIS; ++z) {
-                delta += abs(sources.back().zscore[z] - sources[y].zscore[z]);
+                delta = delta + abs(sources.back().zscore[z] - sources[y].zscore[z]);
             }
             delta /= PRECIS;
-            // stores the final deltas for *this object
             sub_delta[y] = delta;
-            if (analysis) std::cout << std::fixed << std::setprecision(5) << delta << ",";
         }
-        if (analysis) std::cout << std::endl;
     }
 public:
+    // allows for temp creation
     delta();
     
+    // loads the fixed feature depth run
     delta(const std::vector<std::pair<std::string,int>> &corpus, const std::vector<std::pair<std::string, std::string>> &authors, bool verbose) {
         statistics.resize(corpus.size());
         sub_delta.resize(authors.size() - 1);
         PRECIS = corpus.size();
-        
         analysis = verbose;
         
         // creates the features for each author
@@ -163,6 +162,5 @@ public:
         calculate_zscore();
         calculate_delta();
     }
-    // print things : WORD
 };
 #endif /* base_hpp */
