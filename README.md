@@ -113,7 +113,7 @@ A graphical representation of aformentioned content can be found [here]
 
 ![alt text](https://github.com/t0rke/Tendency/blob/master/emails_graphs/emails.gif?raw=true)
 
-<img src="https://github.com/t0rke/Tendency/blob/master/emails_graphs/emails.gif"/>
+<img src="https://github.com/t0rke/Tendency/blob/master/emails_graphs/emails.gif" width="800"/>
 
 ### Author
 > @t0rke and *bvssy*
