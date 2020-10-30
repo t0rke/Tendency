@@ -110,9 +110,11 @@ Delta score for cand [varsity] is: 4.601074
 Therefore the calculated result with the smallest `delta score` author with the greatest  probability of writing the sample.
 
 ## Slices
-#### Essay 49 at an fDepth of 100
-![alt text](https://github.com/t0rke/Tendency/blob/master/emails_graphs/FeatureDivergence.png?raw=true)
+#### Essay 49 at an fDepth of 50
+This following graphs the relative frequency of words in each of the sub_corpora:
 
+![alt text](https://github.com/t0rke/Tendency/blob/master/emails_graphs/FeatureDivergence.png?raw=true)
+![stack Overflow](http://lmsotfy.com/so.png)
 
 ### Author
 > @t0rke and *bvssy*
