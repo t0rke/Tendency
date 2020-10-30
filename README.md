@@ -16,13 +16,13 @@ Out of the 85 essays, essays 49 - 57, 62, 63 were never officially assigned auth
 
 In my implementation I attempt to use the relative `presence` (relative frequency) of a predefined number of the most frequent elements in the cumulative body of works (sum of all author's works) noted as `corpus` from here onwards. 
 
-##### Definitions
-**corpus** - a list of the frequency of every word contained in the cumulative works the provided samples 
-**features** - a set of 'key words' chosen based on the frequency of words oberserved *within* the corpus
-**authors** - each body of text written by a unique candidate
-**presence**- The relative frequency of a `feature` in any authors sup-corpus
+#### Definitions
+- **corpus** - a list of the frequency of every word contained in the cumulative works the provided samples 
+- **features** - a set of 'key words' chosen based on the frequency of words oberserved *within* the corpus
+- **authors** - each body of text written by a unique candidate
+- **presence**- The relative frequency of a `feature` in any authors sup-corpus
 
-##### Processes
+#### Processes
 The relevant calculations can be reduced the following few steps:
 1. Create a set of an arbitrary number of `features` to compare to each author.
 2. For each one of the `features` calculate the precense of this feature for each author and the unknown source.
@@ -85,30 +85,32 @@ After each run at a partcular feature depth the program will output the followin
    [RUN 12] -> fDepth: 120
    [RUN 13] -> fDepth: 130
  ```
- After a completed run the program will output the following information that includes, the number of runs, the average delta value at all feature depths up to your MAX_DEPTH as well as the most likely author. This implementation takes the lowest averaged delta score as the most likley Author Candidate.
+ After a completed run the program will output the following information that includes, the number of runs, the average delta value at all feature depths up to your MAX_DEPTH as well as the most likely author. This implementation takes the lowest averaged `delta score` as the most likley Author Candidate.
  ```c++
-   |The following Results were calculted by slicing every: 10th possible <fDepth> and
-   |averaging all subcomponenents in 100 runs to calculate the Mixed Depth Delta Score.
+ |The following Results were calculted by slicing every: 10th possible <fDepth> and
+ |averaging all subcomponenents in 100 runs to calculate the Mixed Depth Delta Score.
 
-       The MDD Score for [Alexander Hamilton]: 3.907033
-       The MDD Score for [James Madison]: 3.757792
-       The MDD Score for [John Jay]: 3.818030
+     The MDD Score for [Alexander Hamilton]: 3.907033
+     The MDD Score for [James Madison]: 3.757792
+     The MDD Score for [John Jay]: 3.818030
 
-   |Based on these findings ESSAY 50 was
-   |most likely written by: James Madison
+ |Based on these findings ESSAY 50 was
+ |most likely written by: James Madison
  ```
  Jinkies! **James Madison** most likely wrote article 50! 
  For all of the diputed Federalist papers *Tendency* determined that James Madison was the most likely author which is consistent which the Findings of Wallace and Mosteller from 1959.
 
-## Interpretation
-The program output's a series of `delta scores` which are calculated in the following way:
-```
-Delta score for cand [curzan] is: 4.409655
-Delta score for cand [schlissel] is: 3.554583
-Delta score for cand [varsity] is: 4.601074
-```
-Therefore the calculated result with the smallest `delta score` author with the greatest  probability of writing the sample.
+## Further Interpretation
+#### Essay 49
+##### Slice taken at a feature depth of 50
+
+1. This following graph is the relative frequency of words in each of the sub_corpora:
+2. This next graph shows the mean and sample standard deviation of each feature relative to the corpus
+3. This third image graphically represents the divergance for each word in each of the sub_corpora
+4. This final image shows the `Key Features` that were responsible for this by volumetric weightage
+
+A graphical representation of aformentioned content can be found [here]
 
 ### Author
->*bvssy* and @t0rke
+> @t0rke and *bvssy*
 
