@@ -87,15 +87,15 @@ After each run at a partcular feature depth the program will output the followin
  ```
  After a completed run the program will output the following information that includes, the number of runs, the average delta value at all feature depths up to your MAX_DEPTH as well as the most likely author. This implementation takes the lowest averaged delta score as the most likley Author Candidate.
  ```c++
-   |The following Results were calculted by slicing every: 10th possible <fDepth> and
-   |averaging all subcomponenents in 100 runs to calculate the Mixed Depth Delta Score.
+ |The following Results were calculted by slicing every: 10th possible <fDepth> and
+ |averaging all subcomponenents in 100 runs to calculate the Mixed Depth Delta Score.
 
-       The MDD Score for [Alexander Hamilton]: 3.907033
-       The MDD Score for [James Madison]: 3.757792
-       The MDD Score for [John Jay]: 3.818030
+     The MDD Score for [Alexander Hamilton]: 3.907033
+     The MDD Score for [James Madison]: 3.757792
+     The MDD Score for [John Jay]: 3.818030
 
-   |Based on these findings ESSAY 50 was
-   |most likely written by: James Madison
+ |Based on these findings ESSAY 50 was
+ |most likely written by: James Madison
  ```
  Jinkies! **James Madison** most likely wrote article 50! 
  For all of the diputed Federalist papers *Tendency* determined that James Madison was the most likely author which is consistent which the Findings of Wallace and Mosteller from 1959.
@@ -109,6 +109,11 @@ Delta score for cand [varsity] is: 4.601074
 ```
 Therefore the calculated result with the smallest `delta score` author with the greatest  probability of writing the sample.
 
+## Slices
+#### Essay 49 at an fDepth of 100
+![alt text](https://github.com/t0rke/Tendency/blob/master/emails_graphs/FeatureDivergence.png?raw=true)
+
+
 ### Author
->*bvssy* and @t0rke
+> @t0rke and *bvssy*
 
