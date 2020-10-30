@@ -85,7 +85,7 @@ After each run at a partcular feature depth the program will output the followin
    [RUN 12] -> fDepth: 120
    [RUN 13] -> fDepth: 130
  ```
- After a completed run the program will output the following information that includes, the number of runs, the average delta value at all feature depths up to your MAX_DEPTH as well as the most likely author. This implementation takes the lowest averaged delta score as the most likley Author Candidate.
+ After a completed run the program will output the following information that includes, the number of runs, the average delta value at all feature depths up to your MAX_DEPTH as well as the most likely author. This implementation takes the lowest averaged `delta score` as the most likley Author Candidate.
  ```c++
  |The following Results were calculted by slicing every: 10th possible <fDepth> and
  |averaging all subcomponenents in 100 runs to calculate the Mixed Depth Delta Score.
@@ -100,17 +100,9 @@ After each run at a partcular feature depth the program will output the followin
  Jinkies! **James Madison** most likely wrote article 50! 
  For all of the diputed Federalist papers *Tendency* determined that James Madison was the most likely author which is consistent which the Findings of Wallace and Mosteller from 1959.
 
-## Interpretation
-The program output's a series of `delta scores` which are calculated in the following way:
-```
-Delta score for cand [curzan] is: 4.409655
-Delta score for cand [schlissel] is: 3.554583
-Delta score for cand [varsity] is: 4.601074
-```
-Therefore the calculated result with the smallest `delta score` author with the greatest  probability of writing the sample.
-
-## Slices
-#### Essay 49 at an fDepth of 50
+## Further Interpretation
+#### Essay 49
+##### Slice taken at a feature depth of 50
 
 1. This following graph is the relative frequency of words in each of the sub_corpora:
 2. This next graph shows the mean and sample standard deviation of each feature relative to the corpus
