@@ -111,10 +111,13 @@ Therefore the calculated result with the smallest `delta score` author with the 
 
 ## Slices
 #### Essay 49 at an fDepth of 50
-This following graphs the relative frequency of words in each of the sub_corpora:
 
-![alt text](https://github.com/t0rke/Tendency/blob/master/emails_graphs/FeatureDivergence.png?raw=true)
-![stack Overflow](http://lmsotfy.com/so.png)
+1. This following graph is the relative frequency of words in each of the sub_corpora:
+2. This next graph shows the mean and sample standard deviation of each feature relative to the corpus
+3. This third image graphically represents the divergance for each word in each of the sub_corpora
+4. This final image shows the `Key Features` that were responsible for this by volumetric weightage
+
+A graphical representation of aformentioned content can be found [here]
 
 ### Author
 > @t0rke and *bvssy*
