@@ -111,7 +111,9 @@ After each run at a partcular feature depth the program will output the followin
 
 A graphical representation of aformentioned content can be found [here]
 
-![alt text](https://github.com/t0rke/Tendency/master/emails_graphs/emails.gif?raw=true)
+![alt text](https://github.com/t0rke/Tendency/blob/master/emails_graphs/emails.gif?raw=true)
+
+<img src="https://github.com/t0rke/Tendency/blob/master/emails_graphs/emails.gif"/>
 
 ### Author
 > @t0rke and *bvssy*
