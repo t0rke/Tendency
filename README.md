@@ -110,6 +110,7 @@ After each run at a partcular feature depth the program will output the followin
 4. This final image shows the `Key Features` that were responsible for this by volumetric weightage
 
 A graphical representation of aformentioned content can be found [here]
+
 ![alt text](https://github.com/t0rke/Tendency/blob/master/emails_graphs/emails.gif?raw=true)
 
 ### Author
