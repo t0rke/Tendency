@@ -13,12 +13,14 @@
 #include <fstream>
 #include <stdio.h>
 
+// used to sort the frequency in decending order
 struct compare {
     bool operator()(const std::pair<std::string,int> &lhs, const std::pair<std::string,int> &rhs) const {
         return (lhs.second > rhs.second);
     }
 };
 
+// holds the "corpus'" mean, stdev and delta score
 struct data {
     double mean = 0, stdev = 0, delta = 0;
 };
@@ -140,10 +142,10 @@ private:
         }
     }
 public:
-    // allows for temp creation
+    // def ctor
     delta();
     
-    // loads the fixed feature depth run
+    // mod ctor to hold each <fdepth> run
     delta(const std::vector<std::pair<std::string,int>> &corpus, const std::vector<std::pair<std::string, std::string>> &authors, bool verbose) {
         statistics.resize(corpus.size());
         sub_delta.resize(authors.size() - 1);
@@ -156,7 +158,7 @@ public:
         }
         upper_bound = int(sources.size() - 1);
         
-        // calculates the following stats for each feature;
+        // calculates the following statistics for each feature;
         calculate_mean();
         calculate_stdev();
         calculate_zscore();

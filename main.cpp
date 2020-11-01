@@ -1,5 +1,5 @@
 //
-//  processor.cpp
+//  main.cpp
 //  Tendency
 //
 //  Created by Suneeth Torke on 10/21/20.
@@ -73,11 +73,11 @@ vector<pair<string,string>> prep_data() {
     return sources;
 }
 
-// prints the run report after a completed run
+// prints the run report after a completed run and identified the possible author
 const void generate_output (const vector<pair<string,string>> &authors, const vector<double> &deltas) {
     cout << endl;
-    cout << "   |The following Results were calculted by slicing every: " + to_string(INTERVAL) + "th possible <fDepth> and" << endl;
-    cout << "   |averaging all subcomponenents in "  + to_string(RUNS) + " runs to calculate the Mixed Depth Delta Score." << endl << endl;
+    cout << "   |The following Results were calculated by slicing every: " + to_string(INTERVAL) + "th possible <fDepth> and" << endl;
+    cout << "   |averaging all subcomponents in "  + to_string(RUNS) + " runs to calculate the Mixed Depth Delta Score." << endl << endl;
     
     for (int l = 0; l < deltas.size(); ++l) {
         cout << "       The MDD Score for [" + authors[l].first + "]: " + to_string(deltas[l] / RUNS) << endl;
@@ -87,7 +87,8 @@ const void generate_output (const vector<pair<string,string>> &authors, const ve
     double min = *min_element(begin(deltas), end(deltas));
     cout << "   |Based on these findings ESSAY " + to_string(DISPUTED_ESSAY) + " was" << endl;
     cout << "   |most likely written by: ";
-    for (size_t i = 0; i < deltas.size(); ++i) if (min == deltas[i]) cout << CANDIDATES[i] << endl << endl;;
+    for (size_t i = 0; i < deltas.size(); ++i) if (min == deltas[i]) cout << CANDIDATES[i] << endl << endl;
+    printf("\x1b[31m Hello World!\n");
 }
 
 // creates a frequency table of ALL POSSIBLE features
@@ -140,6 +141,5 @@ int main(int argc, const char * argv[]) {
     }
     // prints the run report
     generate_output(authors, deltas);
-     
 }
 
