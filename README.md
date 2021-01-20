@@ -115,5 +115,5 @@ A graphical representation of aformentioned content can be found ![here](https:/
 
 
 ### Author
-> @t0rke and *bvssy*
+> @t0rke
 
